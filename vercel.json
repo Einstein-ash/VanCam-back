@@ -1,7 +1,9 @@
 {
-    "version": 2,
-    "builds": [
-      { "src": "gServer.js", "use": "@vercel/node" }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    { "src": "gServer.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "gServer.js" }
+  ]
+}
