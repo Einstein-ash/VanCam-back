@@ -13,8 +13,8 @@ const fetch = require('node-fetch');
 
 const bodyParser = require('body-parser');
 
-// const Front_URL = 'http://localhost:3000'
-const Front_URL = 'https://van-cam.vercel.app'
+const Front_URL = 'http://localhost:3000'
+// const Front_URL = 'https://van-cam.vercel.app'
 
 
 require('dotenv').config();
@@ -87,15 +87,16 @@ passport.deserializeUser((obj, done) => {
 
 
 
-// Routes
+// Route to handle the login 
 app.get('/auth/google',
-  // passport.authenticate('google', { scope: ['profile', 'email'] })
-  passport.authenticate('google', { scope: ['profile', 'email', 'https://www.googleapis.com/auth/photoslibrary',
-  'https://www.googleapis.com/auth/photoslibrary.sharing'
-  ] })
+  passport.authenticate('google', { scope: ['profile', 'email', 
+    // 'https://www.googleapis.com/auth/photoslibrary',
+  // 'https://www.googleapis.com/auth/photoslibrary.sharing',
+  'https://www.googleapis.com/auth/photoslibrary.appendonly',
+  'https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata',
+  ],
+ })
 );
-
-
 
 
 // Storing the access token in the session during authentication
@@ -111,13 +112,13 @@ app.get('/auth/google/callback',
 
 
 app.get('/profile', (req, res) => {
-  console.log('Request object:', req); // Debugging line
+  console.log('Request object:', req); 
   if (!req.isAuthenticated()) {
-    console.log('User is not authenticated'); // Debugging line
+    console.log('User is not authenticated'); 
     return res.redirect('/');
   }
 
-  console.log('Authenticated user:', req.user); // Debugging line
+  console.log('Authenticated user:', req.user);
   
   res.json(req.user);
 });
@@ -304,10 +305,12 @@ app.post('/join-album', async (req, res) => {
 app.get('/albums', async (req, res) => {
   const accessToken = req.headers.authorization?.split(' ')[1]; // Extract the token from the Authorization header
 
-  console.log("Album get - access token: ", accessToken);
+  // console.log("Album get - access token: ", accessToken);
 
   if (!accessToken) {
     return res.status(401).json({ error: 'User not authenticated' });
+  }  else {
+    console.log("Token is ok :)")
   }
 
   try {
@@ -322,7 +325,9 @@ app.get('/albums', async (req, res) => {
     res.json({ albums: response.data.albums });
     // res.json({ albums: response.data.albums });
   } catch (error) {
-    console.error('Error fetching albums:', error);
+    // console.error('Error fetching albums:', error);
+
+    console.log("backend error in geting albums : /albums api ->", error.message);
     res.status(500).json({ error: 'Failed to fetch albums' });
   }
 });
@@ -334,10 +339,13 @@ app.get('/albums', async (req, res) => {
 app.get('/shared-albums', async (req, res) => {
   const accessToken = req.headers.authorization?.split(' ')[1]; // Extract the token from the Authorization header
 
-  console.log("Shared Albums - access token: ", accessToken);
+  // console.log("Shared Albums - access token: ", accessToken);
 
   if (!accessToken) {
     return res.status(401).json({ error: 'User not authenticated' });
+  }
+  else {
+    console.log("Token is ok :)")
   }
 
   try {
@@ -351,7 +359,7 @@ app.get('/shared-albums', async (req, res) => {
     // Send the shared albums data back to the client
     res.json({ sharedAlbums: response.data.sharedAlbums });
   } catch (error) {
-    console.error('Error fetching shared albums:', error);
+    console.log("backend error in geting Shared Albums ->", error.message);
     res.status(500).json({ error: 'Failed to fetch shared albums' });
   }
 });
